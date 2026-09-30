@@ -666,3 +666,85 @@ Antes de dejarlo desatendido, probar con `--dry-run` (no envía nada ni toca el
 estado — sección 10) corriendo el mismo `ExecStart` del `.service` a mano, y
 luego una corrida real para confirmar el mensaje de "sistema registrado" de la
 primera ejecución (sección 5, criterio de aceptación #1).
+
+---
+
+## 13. Verificación en sitio (para mostrarle al cliente)
+
+Comandos simples, sin comillas anidadas ni caracteres raros — pensados para
+tipear a mano frente al cliente sin margen de error de transcripción. Todos
+se corren desde `/opt/monitor-procesos` salvo que se indique lo contrario.
+
+### 1. El sistema está activo y programado
+
+```bash
+systemctl status monitor-procesos.timer
+```
+
+Buscar: `Active: active (running)` y un `Trigger:` con una fecha futura (no
+`n/a` — si sale eso, probar `sudo systemctl restart monitor-procesos.timer`).
+
+### 2. Arranca solo, sin que nadie tenga que hacer nada — ni tras un apagón
+
+```bash
+systemctl is-enabled monitor-procesos.timer
+```
+
+Debe decir `enabled`. Esto es lo que garantiza que, si el equipo se apaga y
+se prende de nuevo, el monitoreo se reanuda solo.
+
+### 3. Corrida en vivo, delante del cliente
+
+```bash
+sudo systemctl start monitor-procesos.service
+journalctl -u monitor-procesos.service -n 20 --no-pager
+```
+
+Muestra la corrida recién disparada: qué radicados consultó y qué decidió
+para cada uno (`PROCESO_NUEVO`, `SIN_CAMBIO`, `NOVEDAD_NIVEL1`, etc.).
+
+### 4. Historial completo de la aplicación
+
+```bash
+tail -50 monitor_procesos.log
+```
+
+### 5. El Excel compartido está funcionando
+
+```bash
+systemctl status smbd
+ls -la /srv/procesos-compartido/
+```
+
+(La prueba real es que el cliente lo abra y edite desde su propio Windows —
+esto solo confirma que el servicio está corriendo del lado del servidor.)
+
+### 6. No se suspende al cerrar la tapa
+
+```bash
+cat /etc/systemd/logind.conf.d/logind-no-suspender-tapa.conf
+```
+
+Debe mostrar las tres líneas `HandleLidSwitch*=ignore`.
+
+### 7. Zona horaria correcta
+
+```bash
+timedatectl
+```
+
+Debe decir `Time zone: America/Bogota` y `System clock synchronized: yes`.
+
+### 8. Próxima corrida programada
+
+```bash
+systemctl list-timers monitor-procesos.timer
+```
+
+### Si algo no coincide
+
+- `journalctl -u monitor-procesos.service -n 50 --no-pager` — log detallado
+  de la última corrida, incluye errores.
+- El correo (`[correo]` en `config.toml`) queda desactivado hasta tener la
+  cuenta de Gmail dedicada (sección 6) — mientras tanto, `ntfy` es el único
+  canal activo, y eso es esperado, no un error.
