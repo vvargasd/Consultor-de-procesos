@@ -1,0 +1,37 @@
+# Plantilla de configuración — copiar a config.toml y ajustar.
+# Contiene una credencial (password_app): en producción, permisos 600 y
+# fuera de control de versiones (sección 8 del spec).
+
+[excel]
+ruta = "/home/usuario/procesos.xlsx"
+hoja = "Hoja 1"
+columna_radicado = "NUMERO DE PROCESO"
+columna_nombre = "demandante"
+
+[deteccion]
+ventana_vigilancia_dias = 7
+
+[correo]
+activo = false
+servidor = "smtp.gmail.com"
+puerto = 465
+remitente = "..."        # email de la cuenta de Gmail nueva y dedicada (sección 6)
+password_app = "..."     # contraseña de aplicación, NO la de la cuenta
+destinatarios = ["..."]
+resumen_diario = true    # un correo al día aunque no haya novedades ni fallos
+
+[ntfy]
+activo = true
+tema = "..."             # cadena aleatoria larga, no adivinable (ej. k7x2m9qw4rt8pz)
+
+[red]
+pausa_entre_peticiones = 1.0
+timeout = 30
+reintentos = 3
+
+[estado]
+ruta_db = "/home/usuario/monitor_procesos_estado.sqlite3"
+
+[operacion]
+ruta_log = "/home/usuario/monitor_procesos.log"
+ruta_lockfile = "/home/usuario/monitor_procesos.lock"

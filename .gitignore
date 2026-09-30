@@ -1,0 +1,12 @@
+# Entorno
+.venv/
+__pycache__/
+*.pyc
+
+# Datos y credenciales reales del cliente — nunca al repo.
+# Solo config.ejemplo.toml (con "..." como placeholder) es público.
+config.toml
+*.xlsx
+*.sqlite3
+*.log
+*.lock

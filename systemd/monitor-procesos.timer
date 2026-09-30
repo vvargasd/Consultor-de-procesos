@@ -1,0 +1,22 @@
+[Unit]
+Description=Dispara el monitor de procesos judiciales 3 veces al día
+
+[Timer]
+# Horarios en hora local del sistema — requiere que el sistema tenga la zona
+# horaria en America/Bogota (ver instrucciones de despliegue, spec sección 2).
+# Ajustar a gusto; no hay nada especial en estos horarios salvo que caen en
+# horario hábil.
+OnCalendar=*-*-* 08:00:00
+OnCalendar=*-*-* 13:00:00
+OnCalendar=*-*-* 18:00:00
+
+# Si el equipo estuvo apagado y se perdió una corrida, recuperarla poco
+# después de arrancar (spec sección 2).
+OnBootSec=10min
+
+# Si el equipo estuvo apagado a la hora programada, correr apenas encienda
+# en vez de esperar al siguiente horario (systemd guarda la última corrida).
+Persistent=true
+
+[Install]
+WantedBy=timers.target

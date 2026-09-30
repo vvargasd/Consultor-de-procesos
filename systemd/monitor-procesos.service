@@ -1,0 +1,20 @@
+[Unit]
+Description=Monitor de procesos judiciales - Rama Judicial (CPNU)
+Documentation=file:///opt/monitor-procesos/monitor-procesos-spec.md
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=monitor
+WorkingDirectory=/opt/monitor-procesos
+ExecStart=/opt/monitor-procesos/.venv/bin/python -m monitor_procesos.ejecutar --config /opt/monitor-procesos/config.toml
+
+# Endurecimiento básico: el proceso solo necesita leer el Excel, leer/escribir
+# su propio estado y log, y salir a la red. No necesita privilegios de root
+# ni escribir fuera de su propio directorio.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/monitor-procesos
